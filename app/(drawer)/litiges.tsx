@@ -1,18 +1,27 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
-import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import Header from '../components/Header';
 
 export default function Litiges() {
   const [transactionId, setTransactionId] = useState('');
   const [titre, setTitre] = useState('');
   const [description, setDescription] = useState('');
-const [imageUri, setImageUri] = useState<string | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
 
-const pickImage = async () => {
+  const pickImage = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      alert('Permission requise pour accéder à la galerie');
+      Alert.alert('Permission refusée', 'Autorisation nécessaire pour accéder à la galerie.');
       return;
     }
 
@@ -27,63 +36,127 @@ const pickImage = async () => {
     }
   };
 
-
-
   const handleSubmit = () => {
-    // Ici tu peux envoyer les données + imageUri vers ton backend
+    // Envoi des données
     Alert.alert('Litige soumis', 'Votre litige a été envoyé avec succès.');
+    setTransactionId('');
+    setTitre('');
+    setDescription('');
+    setImageUri(null);
   };
 
   return (
-    <View style={styles.container}>
-    
-      <Text style={styles.heading}>Créer un litige</Text>
-      <Text>Numero de la transaction</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ex: 123456"
-        value={transactionId}
-        onChangeText={setTransactionId}
-      />
+    <View style={{ flex: 1, backgroundColor: '#f4f6f8' }}>
+      <Header />
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.heading}>Créer un litige</Text>
 
-      <Text>Titre du litige</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ex: Produit endommagé"
-        value={titre}
-        onChangeText={setTitre}
-      />
+        <Text style={styles.label}>N° de transaction</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Ex: 123456"
+          value={transactionId}
+          onChangeText={setTransactionId}
+        />
 
-      <Text>Description</Text>
-      <TextInput
-        style={[styles.input, { height: 100 }]}
-        multiline
-        placeholder="Décrivez avec detail qu est ce qui s est passer"
-        value={description}
-        onChangeText={setDescription}
-      />
+        <Text style={styles.label}>Titre du litige</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Ex: Produit endommagé"
+          value={titre}
+          onChangeText={setTitre}
+        />
 
-      <Button title="Soumettre le litige" onPress={handleSubmit} />
+        <Text style={styles.label}>Description</Text>
+        <TextInput
+          style={[styles.input, { height: 100 }]}
+          multiline
+          placeholder="Décrivez ce qui s'est passé"
+          value={description}
+          onChangeText={setDescription}
+        />
+
+        {imageUri && (
+          <Image
+            source={{ uri: imageUri }}
+            style={styles.imagePreview}
+            resizeMode="cover"
+          />
+        )}
+
+        <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
+          <Text style={styles.uploadText}>
+            {imageUri ? 'Changer l’image' : 'Ajouter une image'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <Text style={styles.submitText}>Soumettre le litige</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
-    backgroundColor: '#fff',
-    flex: 1,
+    padding: 20,
+    backgroundColor: '#f4f6f8',
   },
   heading: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 24,
+    textAlign: 'center',
+    color: '#222',
+  },
+  label: {
+    fontSize: 15,
+    marginBottom: 6,
+    color: '#555',
   },
   input: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 18,
+    fontSize: 15,
+  },
+  uploadButton: {
+    backgroundColor: '#007bff',
+    padding: 12,
+    borderRadius: 50,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  uploadText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  submitButton: {
+    backgroundColor: '#28a745',
+    padding: 16,
+    borderRadius: 50,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 5,
+  },
+  submitText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  imagePreview: {
+    width: '100%',
+    height: 180,
+    borderRadius: 12,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 6,
-    padding: 10,
-    marginBottom: 16,
   },
 });

@@ -37,6 +37,11 @@ export default function CustomDrawerContent(props: any) {
             icon={({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />}
             onPress={() => router.push('/parametres')}
           />
+          <DrawerItem
+            label="Login"
+            icon={({ color, size }) => <Ionicons name="settings-outline" size={size} color={color} />}
+            onPress={() => router.push('/login')}
+          />
 
           <DrawerItem
             label="Déconnexion"

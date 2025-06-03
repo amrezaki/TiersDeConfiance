@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Alert, Button, Linking, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import Header from '../components/Header';
 
 export default function Support() {
   const [nom, setNom] = useState('');
@@ -28,6 +29,7 @@ export default function Support() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Header></Header>
       <Text style={styles.heading}>Support</Text>
       <Text style={styles.intro}>
         Vous avez une question ou un problème ? Envoyez-nous un message et nous vous répondrons rapidement.

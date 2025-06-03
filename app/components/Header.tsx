@@ -3,11 +3,11 @@ import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
+  Image,
   Platform,
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -25,6 +25,7 @@ export default function Header() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
+        
         {/* Menu hamburger */}
         <TouchableOpacity
           onPress={() => navigation.openDrawer()}
@@ -33,8 +34,12 @@ export default function Header() {
           <Ionicons name="menu-outline" size={28} color="black" />
         </TouchableOpacity>
 
-        {/* Titre centré */}
-        <Text style={styles.title}>Dashboard</Text>
+        {/* Logo centré */}
+        <Image
+          source={require("../../assets/logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
 
         {/* Icônes à droite */}
         <View style={styles.rightIcons}>
@@ -83,10 +88,8 @@ const styles = StyleSheet.create({
   icon: {
     marginRight: 12,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
+  logo: {
+    width: 420,
+    height: 70,
   },
 });

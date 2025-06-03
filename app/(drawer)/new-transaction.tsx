@@ -1,3 +1,5 @@
+// app/(drawer)/new-transaction.tsx
+
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -10,7 +12,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import Header from '../components/Header';
 
@@ -30,10 +32,11 @@ export default function NewTransaction() {
       return;
     }
 
+    // Réinitialiser
     setTitle('');
     setAmount('');
     setPrenom('');
-    setNom('');
+   // setNom('');
     setTelephone('');
 
     router.push({
@@ -48,49 +51,33 @@ export default function NewTransaction() {
       style={{ flex: 1 }}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Header />
         <View style={styles.container}>
-        
           <Text style={styles.heading}>Nouvelle transaction</Text>
 
-          <Text style={styles.label}>Titre de la transaction</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ex: Paiement électricité"
-            value={title}
-            onChangeText={setTitle}
-          />
-
-          <Text style={styles.label}>Prénom du destinataire</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Entrer le prénom"
-            value={prenom}
-            onChangeText={setPrenom}
-          />
-
-          <Text style={styles.label}>Nom du destinataire</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Entrer le nom"
-            value={nom}
-            onChangeText={setNom}
-          />
-
-          <Text style={styles.label}>Numéro de téléphone</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Ex: +221770000000"
-            value={telephone}
-            keyboardType="phone-pad"
-            onChangeText={setTelephone}
-          />
-
-          <Text style={styles.label}>Montant</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Montant en Fcfa"
+          {/* Champs principaux */}
+          <Input label="Titre" placeholder="Ex: Paiement facture" value={title} onChange={setTitle} />
+          <Input label="Prénom et nom du vendeur " placeholder="identite du vendeur" value={prenom} onChange={setPrenom} />
+         
+          <View style={{ marginBottom: 16 }}>
+  <Text style={styles.label}>Numéro de téléphone</Text>
+  <View style={styles.phoneInputContainer}>
+    <Text style={styles.prefix}>+221</Text>
+    <TextInput
+      style={styles.phoneInput}
+      placeholder="770000000"
+      value={telephone}
+      keyboardType="phone-pad"
+      onChangeText={setTelephone}
+      maxLength={9} // facultatif pour limiter à 9 chiffres après le +221
+    />
+  </View>
+</View>
+          <Input
+            label="Montant"
+            placeholder="Ex: 5000"
             value={amount}
-            onChangeText={setAmount}
+            onChange={setAmount}
             keyboardType="numeric"
           />
 
@@ -103,55 +90,100 @@ export default function NewTransaction() {
   );
 }
 
+
+type InputProps = {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (text: string) => void;
+  keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad';
+};
+
+function Input({ label, placeholder, value, onChange, keyboardType = 'default' }: InputProps) {
+  return (
+    <View style={{ marginBottom: 16 }}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput
+        style={styles.input}
+        placeholder={placeholder}
+        value={value}
+        onChangeText={onChange}
+        keyboardType={keyboardType}
+      />
+    </View>
+  );
+}
+
+
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
     backgroundColor: '#f4f6f8',
-    paddingVertical: 20,
   },
   container: {
     flex: 1,
-    paddingHorizontal: width * 0.06, // responsive horizontal padding
-    paddingTop: 40,
+    paddingHorizontal: width * 0.06,
+    paddingTop: 30,
+    paddingBottom: 60,
   },
   heading: {
-    fontSize: 26,
-    fontWeight: '700',
-    marginBottom: 30,
+    fontSize: 22,
+    fontWeight: '600',
+    marginBottom: 24,
     color: '#1a1a1a',
     textAlign: 'center',
   },
   label: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '500',
-    marginBottom: 6,
     color: '#333',
+    marginBottom: 6,
   },
   input: {
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#ddd',
-    padding: 14,
+    padding: 12,
     borderRadius: 10,
-    marginBottom: 18,
     fontSize: 16,
   },
   button: {
     backgroundColor: '#007bff',
-    padding: 16,
+    padding: 14,
     borderRadius: 50,
     alignItems: 'center',
-    marginTop: 30,
+    marginTop: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 4,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
+  },
+  phoneInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    marginBottom: 18,
+  },
+
+  prefix: {
+    fontSize: 16,
+    marginRight: 8,
+    color: '#333',
+  },
+
+  phoneInput: {
+    flex: 1,
+    paddingVertical: 14,
     fontSize: 16,
   },
 });
