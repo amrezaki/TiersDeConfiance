@@ -1,13 +1,11 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import {
-  FlatList,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Header from '../components/Header';
+import QuickActions from '../components/QuickActions';
+import RecentTransactions from '../components/RecentTransactions';
+import UserStats from '../components/UserStats';
+import Welcome from '../components/Welcome';
 
 type Transaction = {
   id: string;
@@ -18,6 +16,8 @@ type Transaction = {
 };
 
 export default function Dashboard() {
+  const userName = "killer"; // Tu peux le récupérer dynamiquement plus tard
+
   const router = useRouter();
   const [transactions] = useState<Transaction[]>([
     { id: '1', title: 'Achat de marchandise', amount: 200, status: 'terminée', date: '2025-05-15' },
@@ -33,26 +33,14 @@ export default function Dashboard() {
   return (
     <View style={styles.container}>
       <Header />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+<Welcome name={userName} />
+  
+      <UserStats/>
+      <QuickActions/>
+      <RecentTransactions />
       <View style={styles.content}>
-        <Text style={styles.title}>Statistiques</Text>
-        <View style={styles.stats}>
-          <View style={styles.statBox}>
-            <Text style={styles.statLabel}>Total</Text>
-            <Text style={styles.statValue}>{total}</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statLabel}>Terminées</Text>
-            <Text style={styles.statValue}>{terminees}</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statLabel}>En attente</Text>
-            <Text style={styles.statValue}>{enAttente}</Text>
-          </View>
-          <View style={styles.statBox}>
-            <Text style={styles.statLabel}>Litiges</Text>
-            <Text style={styles.statValue}>{enLitige}</Text>
-          </View>
-        </View>
+
 
         <Text style={styles.subtitle}>Historique Des Transactions</Text>
         <FlatList
@@ -68,6 +56,7 @@ export default function Dashboard() {
           )}
         />
       </View>
+      </ScrollView>
 
       {/* Bouton flottant pour créer une transaction */}
       <TouchableOpacity
@@ -85,6 +74,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f9f9f9',
+    
+  },
+  scrollContent: {
+    paddingBottom: 40,
+    paddingTop: 16,
   },
   content: {
     flex: 1,
