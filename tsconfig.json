@@ -1,16 +1,23 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
+    "target": "esnext",
+    "module": "node16",
+    "jsx": "react-jsx",
     "strict": true,
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+    "moduleResolution": "node16",
+    "customConditions": ["react-native"],
+    "allowJs": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "resolveJsonModule": true,           // ✅ utile pour importer des .json
+    "isolatedModules": true              // ✅ recommandé pour React Native
   },
   "include": [
-    "**/*.ts",
-    "**/*.tsx",
+    "src",
+    "App.tsx",
+    "index.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ]

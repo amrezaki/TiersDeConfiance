@@ -1,6 +1,17 @@
+
+
 import { useRouter } from 'expo-router';
+
+
 import { useState } from 'react';
-import { FlatList, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
 import Header from '../components/Header';
 import QuickActions from '../components/QuickActions';
 import RecentTransactions from '../components/RecentTransactions';
@@ -15,50 +26,61 @@ type Transaction = {
   date: string;
 };
 
-export default function Dashboard() {
-  const userName = "killer"; // Tu peux le récupérer dynamiquement plus tard
+// 🎨 Couleurs principales Zakipay
+const PRIMARY_BLUE = '#007bff';
+const PRIMARY_GREEN = '#00c853';
+const LIGHT_BACKGROUND = '#f0fdf6';
 
+export default function Dashboard() {
+  const userName = 'killer';
   const router = useRouter();
+
   const [transactions] = useState<Transaction[]>([
     { id: '1', title: 'Achat de marchandise', amount: 200, status: 'terminée', date: '2025-05-15' },
     { id: '2', title: 'Service freelance', amount: 150, status: 'en attente', date: '2025-05-18' },
     { id: '3', title: 'Litige client', amount: 90, status: 'litige', date: '2025-05-19' },
   ]);
 
-  const total = transactions.length;
-  const enLitige = transactions.filter(t => t.status === 'litige').length;
-  const terminees = transactions.filter(t => t.status === 'terminée').length;
-  const enAttente = transactions.filter(t => t.status === 'en attente').length;
-
   return (
     <View style={styles.container}>
       <Header />
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-<Welcome name={userName} />
-  
-      <UserStats/>
-      <QuickActions/>
-      <RecentTransactions />
-      <View style={styles.content}>
 
+      <FlatList
+        contentContainerStyle={styles.scrollContent}
+        data={transactions}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={
+          <View>
+            <Welcome name={userName} />
+            <UserStats />
+            <QuickActions />
+            <RecentTransactions />
+            <Text style={styles.subtitle}>Historique des Transactions</Text>
+          </View>
+        }
+        renderItem={({ item }) => (
+          <View
+            style={[
+              styles.transactionItem,
+              {
+                borderLeftColor:
+                  item.status === 'terminée'
+                    ? PRIMARY_GREEN
+                    : item.status === 'en attente'
+                    ? PRIMARY_BLUE
+                    : '#e53935', // Rouge pour litige
+              },
+            ]}
+          >
+            <Text style={styles.transactionTitle}>{item.title}</Text>
+            <Text style={styles.transactionText}>Montant : {item.amount} FCFA</Text>
+            <Text style={styles.transactionText}>Statut : {item.status}</Text>
+            <Text style={styles.transactionText}>Date : {item.date}</Text>
+          </View>
+        )}
+        ListFooterComponent={<View style={{ height: 100 }} />}
+      />
 
-        <Text style={styles.subtitle}>Historique Des Transactions</Text>
-        <FlatList
-          data={transactions}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.transactionItem}>
-              <Text style={styles.transactionTitle}>{item.title}</Text>
-              <Text style={styles.transactionText}>Montant : {item.amount} fcfa</Text>
-              <Text style={styles.transactionText}>Statut : {item.status}</Text>
-              <Text style={styles.transactionText}>Date : {item.date}</Text>
-            </View>
-          )}
-        />
-      </View>
-      </ScrollView>
-
-      {/* Bouton flottant pour créer une transaction */}
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={() => router.push('/(drawer)/new-transaction')}
@@ -70,74 +92,34 @@ export default function Dashboard() {
 }
 
 const styles = StyleSheet.create({
-  
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
-    
+    backgroundColor: LIGHT_BACKGROUND,
   },
   scrollContent: {
     paddingBottom: 40,
     paddingTop: 16,
-  },
-  content: {
-    flex: 1,
-    padding: 16,
-    paddingBottom: 100,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 8,
-    color: '#333',
+    paddingHorizontal: 16,
   },
   subtitle: {
     fontSize: 18,
     fontWeight: '600',
     marginTop: 20,
     marginBottom: 10,
-    color: '#444',
-  },
-  stats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    marginBottom: 20,
-  },
-  statBox: {
-    width: '47%',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  statLabel: {
-    fontSize: 14,
-    color: '#666',
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#007bff',
-    marginTop: 4,
+    color: PRIMARY_BLUE,
   },
   transactionItem: {
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     padding: 12,
     borderRadius: 10,
     marginBottom: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: '#007bff',
+    borderLeftWidth: 5,
   },
   transactionTitle: {
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 4,
+    color: '#222',
   },
   transactionText: {
     fontSize: 14,
@@ -147,7 +129,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 30,
     right: 20,
-    backgroundColor: '#007bff',
+    backgroundColor: PRIMARY_BLUE,
     paddingVertical: 14,
     paddingHorizontal: 20,
     borderRadius: 50,

@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { DrawerNavigationProp } from "@react-navigation/drawer";
 import { useNavigation } from "@react-navigation/native";
-import React from "react";
+import { useRouter } from 'expo-router';
 import {
   Image,
   Platform,
@@ -21,6 +21,7 @@ type RootDrawerParamList = {
 
 export default function Header() {
   const navigation = useNavigation<DrawerNavigationProp<RootDrawerParamList>>();
+  const router = useRouter();
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -35,19 +36,21 @@ export default function Header() {
         </TouchableOpacity>
 
         {/* Logo centré */}
+         <TouchableOpacity onPress={() => router.push('/')}>
         <Image
           source={require("../../assets/logo.png")}
           style={styles.logo}
           resizeMode="contain"
         />
+        </TouchableOpacity>
 
         {/* Icônes à droite */}
         <View style={styles.rightIcons}>
-          <TouchableOpacity onPress={() => console.log("Notifications")} style={styles.icon}>
+          <TouchableOpacity onPress={() => router.push('/Notifications')} style={styles.icon}>
             <Ionicons name="notifications-outline" size={24} color="black" />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => console.log("Profil")}>
+          <TouchableOpacity onPress={() => router.push('/profile')}>
             <Ionicons name="person-circle-outline" size={30} color="black" />
           </TouchableOpacity>
         </View>
