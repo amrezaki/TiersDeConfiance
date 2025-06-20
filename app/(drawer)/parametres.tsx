@@ -1,18 +1,20 @@
 // app/parametres.tsx
 
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
 import Header from '../components/Header';
+import { logout } from '../services/AuthService';
 
 export default function Parametres() {
   const [isDarkMode, setIsDarkMode] = React.useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
-
-  const handleLogout = () => {
-    Alert.alert("Déconnexion", "Êtes-vous sûr de vouloir vous déconnecter ?", [
-      { text: "Annuler", style: "cancel" },
-      { text: "Se déconnecter", onPress: () => console.log("Déconnecté") }
-    ]);
+const router = useRouter ();
+  const handleLogout = async() => {
+    await logout ();
+    Alert.alert("Déconnexion", "vous  vous etes déconnecter !");
+      router.replace ('/login');
+      
   };
 
   return (

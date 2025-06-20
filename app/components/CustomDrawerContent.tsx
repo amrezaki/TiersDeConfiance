@@ -18,7 +18,7 @@ export default function CustomDrawerContent(props: any) {
             label="Accueil"
             icon={({ color, size }) => <Ionicons name="home-outline" size={size} color={color} />}
             onPress={() => router.push('/dashboard')}
-          />
+          /> //
 
           <DrawerItem
             label="Profil"

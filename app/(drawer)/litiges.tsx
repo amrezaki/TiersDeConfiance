@@ -11,9 +11,10 @@ import {
   View,
 } from 'react-native';
 import Header from '../components/Header';
+import { createLitige } from '../services/LitigeServices';
 
 export default function Litiges() {
-  const [transactionId, setTransactionId] = useState('');
+  const [transactionReference, setTransactionReference] = useState('');
   const [titre, setTitre] = useState('');
   const [description, setDescription] = useState('');
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -36,13 +37,29 @@ export default function Litiges() {
     }
   };
 
-  const handleSubmit = () => {
-    // Envoi des données
-    Alert.alert('Litige soumis', 'Votre litige a été envoyé avec succès.');
-    setTransactionId('');
-    setTitre('');
-    setDescription('');
-    setImageUri(null);
+  const handleSubmit = async () => {
+    if (!transactionReference || !titre || !description) {
+      Alert.alert('Erreur', 'Tous les champs sont obligatoires.');
+      return;
+    }
+
+    try {
+      await createLitige({
+        transactionReference: transactionReference.trim(), // si c'est une chaîne (sinon adapte)
+        titre,
+        description,
+        imageUri: imageUri ?? undefined,
+      });
+
+      Alert.alert('Succès', 'Votre litige a été soumis avec succès.');
+      setTransactionReference('');
+      setTitre('');
+      setDescription('');
+      setImageUri(null);
+    } catch (error:any) {
+
+      Alert.alert('Erreur', error.message);
+    }
   };
 
   return (
@@ -51,12 +68,12 @@ export default function Litiges() {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.heading}>Créer un litige</Text>
 
-        <Text style={styles.label}>N° de transaction</Text>
+        <Text style={styles.label}>Référence Transaction</Text>
         <TextInput
           style={styles.input}
-          placeholder="Ex: 123456"
-          value={transactionId}
-          onChangeText={setTransactionId}
+          placeholder="Ex: KM9388D"
+          value={transactionReference}
+          onChangeText={setTransactionReference}
         />
 
         <Text style={styles.label}>Titre du litige</Text>

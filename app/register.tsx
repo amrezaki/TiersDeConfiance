@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Alert,
   Image,
@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import AuthService from './services/AuthService'; // ← ✅ import du service
 
 export default function Register() {
   const router = useRouter();
@@ -16,24 +17,25 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!name || !email || !password) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs.');
       return;
     }
 
-    // ✅ Logique d'inscription ici
-    router.push('/login');
+    try {
+      await AuthService.register(name, email, password);
+      Alert.alert('Succès', 'Inscription réussie !');
+      router.push('/login'); // ← ou '/login' selon ton flux
+    } catch (error: any) {
+      console.error(error);
+      Alert.alert('Erreur', error?.response?.data || 'Une erreur est survenue.');
+    }
   };
 
   return (
     <View style={styles.container}>
-     
-      <Image
-        source={require('../assets/logo.png')}
-        style={styles.logo}
-      />
-
+      <Image source={require('../assets/logo.png')} style={styles.logo} />
       <Text style={styles.title}>Inscription</Text>
 
       <TextInput
@@ -42,7 +44,6 @@ export default function Register() {
         value={name}
         onChangeText={setName}
       />
-
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -50,7 +51,6 @@ export default function Register() {
         onChangeText={setEmail}
         keyboardType="email-address"
       />
-
       <TextInput
         style={styles.input}
         placeholder="Mot de passe"
@@ -70,6 +70,7 @@ export default function Register() {
   );
 }
 
+// Styles identiques à ta version
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -78,7 +79,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f4f6f8',
   },
   logo: {
-    width:220 ,
+    width: 220,
     height: 220,
     resizeMode: 'contain',
     alignSelf: 'center',

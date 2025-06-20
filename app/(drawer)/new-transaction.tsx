@@ -1,5 +1,4 @@
 // app/(drawer)/new-transaction.tsx
-
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
@@ -15,6 +14,7 @@ import {
   View,
 } from 'react-native';
 import Header from '../components/Header';
+import { creerTransaction } from '../services/transactionService'; // <-- ✅ Ajout
 
 const { width } = Dimensions.get('window');
 
@@ -26,23 +26,39 @@ export default function NewTransaction() {
   const [nom, setNom] = useState('');
   const [telephone, setTelephone] = useState('');
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!title || !amount || !prenom || !nom || !telephone) {
       Alert.alert('Erreur', 'Veuillez remplir tous les champs');
       return;
     }
 
-    // Réinitialiser
-    setTitle('');
-    setAmount('');
-    setPrenom('');
-   // setNom('');
-    setTelephone('');
+    const data = {
+      titre: title,
+      montant: parseFloat(amount),
+      prenomVendeur: prenom,
+      nomVendeur: nom,
+      telephoneVendeur: '+221' + telephone,
+    };
 
-    router.push({
-      pathname: '/(drawer)/confirmation',
-      params: { type: 'transaction' },
-    });
+    try {
+      const transaction = await creerTransaction(data);
+
+      Alert.alert('Succès', `Transaction créée avec succès\nRéférence : ${transaction.reference}`);
+
+      setTitle('');
+      setAmount('');
+      setPrenom('');
+      setNom('');
+      setTelephone('');
+
+      router.push({
+        pathname: '/(drawer)/confirmation',
+        params: { type: 'transaction',reference:transaction.reference },
+      });
+    } catch (error: any) {
+      console.error(error);
+      Alert.alert('Erreur', error.message || 'Une erreur est survenue');
+    }
   };
 
   return (
@@ -55,24 +71,25 @@ export default function NewTransaction() {
         <View style={styles.container}>
           <Text style={styles.heading}>Nouvelle transaction</Text>
 
-          {/* Champs principaux */}
           <Input label="Titre" placeholder="Ex: Paiement facture" value={title} onChange={setTitle} />
-          <Input label="Prénom et nom du vendeur " placeholder="identite du vendeur" value={prenom} onChange={setPrenom} />
-         
+          <Input label="Prénom du vendeur" placeholder="Ex: Aliou" value={prenom} onChange={setPrenom} />
+          <Input label="Nom du vendeur" placeholder="Ex: Diop" value={nom} onChange={setNom} />
+
           <View style={{ marginBottom: 16 }}>
-  <Text style={styles.label}>Numéro de téléphone</Text>
-  <View style={styles.phoneInputContainer}>
-    <Text style={styles.prefix}>+221</Text>
-    <TextInput
-      style={styles.phoneInput}
-      placeholder="770000000"
-      value={telephone}
-      keyboardType="phone-pad"
-      onChangeText={setTelephone}
-      maxLength={9} // facultatif pour limiter à 9 chiffres après le +221
-    />
-  </View>
-</View>
+            <Text style={styles.label}>Numéro de téléphone</Text>
+            <View style={styles.phoneInputContainer}>
+              <Text style={styles.prefix}>+221</Text>
+              <TextInput
+                style={styles.phoneInput}
+                placeholder="770000000"
+                value={telephone}
+                keyboardType="phone-pad"
+                onChangeText={setTelephone}
+                maxLength={9}
+              />
+            </View>
+          </View>
+
           <Input
             label="Montant"
             placeholder="Ex: 5000"
@@ -89,7 +106,6 @@ export default function NewTransaction() {
     </KeyboardAvoidingView>
   );
 }
-
 
 type InputProps = {
   label: string;
@@ -113,7 +129,6 @@ function Input({ label, placeholder, value, onChange, keyboardType = 'default' }
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   scrollContainer: {
@@ -174,13 +189,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginBottom: 18,
   },
-
   prefix: {
     fontSize: 16,
     marginRight: 8,
     color: '#333',
   },
-
   phoneInput: {
     flex: 1,
     paddingVertical: 14,

@@ -1,10 +1,7 @@
-
-
 import { useRouter } from 'expo-router';
-
-
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
@@ -12,74 +9,76 @@ import {
   View,
 } from 'react-native';
 
+import * as SecureStore from 'expo-secure-store';
 import Header from '../components/Header';
 import QuickActions from '../components/QuickActions';
 import RecentTransactions from '../components/RecentTransactions';
 import UserStats from '../components/UserStats';
 import Welcome from '../components/Welcome';
+import { getAllTransactions } from '../services/transactionService';
+
+const PRIMARY_BLUE = '#007bff';
+const LIGHT_BACKGROUND = '#f0fdf6';
 
 type Transaction = {
-  id: string;
-  title: string;
-  amount: number;
-  status: 'en attente' | 'terminée' | 'litige';
-  date: string;
+  id: number;
+  titre: string;
+  montant: number;
+  statut: string;
+  dateCreation: string;
 };
-
-// 🎨 Couleurs principales Zakipay
-const PRIMARY_BLUE = '#007bff';
-const PRIMARY_GREEN = '#00c853';
-const LIGHT_BACKGROUND = '#f0fdf6';
 
 export default function Dashboard() {
   const userName = 'killer';
   const router = useRouter();
 
-  const [transactions] = useState<Transaction[]>([
-    { id: '1', title: 'Achat de marchandise', amount: 200, status: 'terminée', date: '2025-05-15' },
-    { id: '2', title: 'Service freelance', amount: 150, status: 'en attente', date: '2025-05-18' },
-    { id: '3', title: 'Litige client', amount: 90, status: 'litige', date: '2025-05-19' },
-  ]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    const checkTokenAndFetchTransactions = async () => {
+      try {
+        const token = await SecureStore.getItemAsync('token');
+        if (!token) {
+          console.warn('Token non trouvé, redirection...');
+          router.replace('/'); // rediriger vers la page de connexion
+          return;
+        }
+
+        const data = await getAllTransactions();
+        setTransactions(data);
+      } catch (err) {
+        console.error('Erreur de chargement des transactions :', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkTokenAndFetchTransactions();
+  }, []);
 
   return (
     <View style={styles.container}>
       <Header />
 
-      <FlatList
-        contentContainerStyle={styles.scrollContent}
-        data={transactions}
-        keyExtractor={(item) => item.id}
-        ListHeaderComponent={
-          <View>
-            <Welcome name={userName} />
-            <UserStats />
-            <QuickActions />
-            <RecentTransactions />
-            <Text style={styles.subtitle}>Historique des Transactions</Text>
-          </View>
-        }
-        renderItem={({ item }) => (
-          <View
-            style={[
-              styles.transactionItem,
-              {
-                borderLeftColor:
-                  item.status === 'terminée'
-                    ? PRIMARY_GREEN
-                    : item.status === 'en attente'
-                    ? PRIMARY_BLUE
-                    : '#e53935', // Rouge pour litige
-              },
-            ]}
-          >
-            <Text style={styles.transactionTitle}>{item.title}</Text>
-            <Text style={styles.transactionText}>Montant : {item.amount} FCFA</Text>
-            <Text style={styles.transactionText}>Statut : {item.status}</Text>
-            <Text style={styles.transactionText}>Date : {item.date}</Text>
-          </View>
-        )}
-        ListFooterComponent={<View style={{ height: 100 }} />}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color={PRIMARY_BLUE} style={{ marginTop: 40 }} />
+      ) : (
+        <FlatList
+          contentContainerStyle={styles.scrollContent}
+          data={[]} // pas d’éléments ici
+          ListHeaderComponent={
+            <View>
+              <Welcome name={userName} />
+              <UserStats />
+              <QuickActions />
+              <RecentTransactions transactions={transactions} />
+            </View>
+          }
+          renderItem={null}
+          ListFooterComponent={<View style={{ height: 100 }} />}
+        />
+      )}
 
       <TouchableOpacity
         style={styles.floatingButton}
@@ -100,30 +99,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     paddingTop: 16,
     paddingHorizontal: 16,
-  },
-  subtitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginTop: 20,
-    marginBottom: 10,
-    color: PRIMARY_BLUE,
-  },
-  transactionItem: {
-    backgroundColor: '#ffffff',
-    padding: 12,
-    borderRadius: 10,
-    marginBottom: 10,
-    borderLeftWidth: 5,
-  },
-  transactionTitle: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 4,
-    color: '#222',
-  },
-  transactionText: {
-    fontSize: 14,
-    color: '#555',
   },
   floatingButton: {
     position: 'absolute',
